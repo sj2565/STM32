@@ -21,7 +21,7 @@ void DWT_Init(void) {
     if (!(DWT->CTRL & DWT_CTRL_CYCCNTENA_Msk)) {
     	DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
     }
-    printf("✔️ DWT 초기화 완료\n");
+    printf("DWT 초기화 완료\n");
 }
 __STATIC_INLINE void DWT_Delay_us(volatile uint32_t microseconds) {
     uint32_t clk_cycle_start = DWT->CYCCNT;
@@ -37,7 +37,7 @@ void DHT22_Set_Pin_Output(void) {
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     HAL_GPIO_Init(DHT22_PORT, &GPIO_InitStruct);
-    printf("📤 DHT22 핀: 출력모드 설정\n");
+    printf("DHT22 핀: 출력모드 설정\n");
 }
 
 void DHT22_Set_Pin_Input(void) {
@@ -46,7 +46,7 @@ void DHT22_Set_Pin_Input(void) {
     GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(DHT22_PORT, &GPIO_InitStruct);
-    printf("📥 DHT22 핀: 입력모드 설정\n");
+    printf("DHT22 핀: 입력모드 설정\n");
 }
 
 // 센서 초기화
@@ -60,7 +60,7 @@ void DHT22_Init(void) {
 uint8_t DHT22_Read(float *temperature, float *humidity) {
     uint8_t data[5] = {0};
     uint32_t timeout = 0;
-    printf("📡 DHT22 센서 읽기 시작\n");
+    printf("DHT22 센서 읽기 시작\n");
 
     // 1. MCU -> Start signal
     DHT22_Set_Pin_Output();
@@ -74,29 +74,29 @@ uint8_t DHT22_Read(float *temperature, float *humidity) {
     timeout = 0;
     while (HAL_GPIO_ReadPin(DHT22_PORT, DHT22_PIN) == GPIO_PIN_SET) {
         if (++timeout > 10000) {
-        	printf("⛔ DHT22 응답 없음 - 초기 LOW 실패\n");
+        	printf("DHT22 응답 없음 - 초기 LOW 실패\n");
         	return 1;
         }
     }
-    printf("✅ 응답1: LOW 감지됨\n");
+    printf("응답1: LOW 감지됨\n");
 
     timeout = 0;
     while (HAL_GPIO_ReadPin(DHT22_PORT, DHT22_PIN) == GPIO_PIN_RESET) {
         if (++timeout > 10000) {
-        	printf("⛔ DHT22 응답 없음 - HIGH 전환 실패\n");
+        	printf("DHT22 응답 없음 - HIGH 전환 실패\n");
         	return 2;
         }
     }
-    printf("✅ 응답2: HIGH 감지됨\n");
+    printf("응답2: HIGH 감지됨\n");
 
     timeout = 0;
     while (HAL_GPIO_ReadPin(DHT22_PORT, DHT22_PIN) == GPIO_PIN_SET) {
         if (++timeout > 10000) {
-        	printf("⛔ DHT22 응답 없음 - 센서 전송 준비 실패\n");
+        	printf("DHT22 응답 없음 - 센서 전송 준비 실패\n");
         	return 3;
         }
     }
-    printf("✅ 응답3: 센서 데이터 수신 준비 완료\n");
+    printf("응답3: 센서 데이터 수신 준비 완료\n");
 
     // 3. 40bit 데이터 수신
     for (int i = 0; i < 40; i++) {
@@ -104,7 +104,7 @@ uint8_t DHT22_Read(float *temperature, float *humidity) {
     	timeout = 0;
         while (HAL_GPIO_ReadPin(DHT22_PORT, DHT22_PIN) == GPIO_PIN_RESET) {
         	if (++timeout > 10000) {
-                printf("⛔ 타임아웃: LOW 대기 실패 (%d)\n", i);
+                printf("타임아웃: LOW 대기 실패 (%d)\n", i);
                 return 1;
             }
         }
@@ -118,7 +118,7 @@ uint8_t DHT22_Read(float *temperature, float *humidity) {
         timeout = 0;
         while (HAL_GPIO_ReadPin(DHT22_PORT, DHT22_PIN) == GPIO_PIN_SET) {
             if (++timeout > 10000) {
-            	printf("⛔ 타임아웃: HIGH 유지 실패 (%d)\n", i);
+            	printf("타임아웃: HIGH 유지 실패 (%d)\n", i);
             	break;
             }
         }
